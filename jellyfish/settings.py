@@ -93,7 +93,7 @@ WSGI_APPLICATION = 'jellyfish.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'djangogirls',
+        'NAME': 'jellyfishdb',
         'USER': 'name',
         'PASSWORD': '',
         'HOST': 'localhost',
