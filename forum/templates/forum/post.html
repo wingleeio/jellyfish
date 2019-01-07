@@ -1,0 +1,32 @@
+{% extends 'forum/base.html' %}
+{% load static %}
+{% block content %}
+<section class="section">
+    <div class="container">
+        <nav class="breadcrumb mobile-padding" aria-label="breadcrumbs">
+            <ul>
+                <li><a href="{% url 'category_page' %}">Home</a></li>
+                <li><a href="{% url 'forum_page' pk=thread.ancestor.pk %}">{{thread.ancestor.title}}</a></li>
+                <li><a href="{% url 'thread_page' pk=thread.pk %}">{{thread.title}}</a></li>
+                <li class="is-active"><a href="#" aria-current="page">New Post</a></li>
+            </ul>
+        </nav>
+        <div class="box">
+            <form method="POST" class="form-reset">
+                {% csrf_token %}
+                {{form}}
+                <br>
+                <button type="submit" class="button has-text-white has-background-primary is-medium">Post Reply</button>
+            </form>
+        </div>
+    </div>
+</section>
+<script>
+    $("#id_title").addClass("input jelly-form-margin");
+    $("#id_content").addClass("textarea jelly-form-margin");
+
+    $("#id_subscribe").addClass("checkbox");
+
+    $("label").addClass("title is-size-6 jelly-form-margin");
+</script>
+{% endblock %}

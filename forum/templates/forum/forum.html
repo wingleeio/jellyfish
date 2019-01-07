@@ -1,0 +1,51 @@
+{% extends 'forum/base.html' %}
+{% load static %}
+{% block content %}
+<section class="section">
+    <div class="container">
+        <nav class="breadcrumb mobile-padding" aria-label="breadcrumbs">
+            <ul>
+                <li><a href="{% url 'category_page' %}">Home</a></li>
+                <li class="is-active"><a href="#" aria-current="page">{{forum.title}}</a></li>
+            </ul>
+        </nav>
+        <div class="box">
+            {% for thread in forum.threads.all %}
+                <div class="u-padding jelly-block">
+                    <div class="jelly-block-main">
+                        <h1 class="title is-size-5 is-marginless"><a href="{% url 'thread_page' pk=thread.pk %}">{{thread.title}}</a></h1>
+                        <p>Last updated {{thread.updated|timesince}} ago.</p>
+                    </div>
+                    <div class="right-jelly-block">
+                    <div class="count">
+                        <h1 class="is-size-6 is-marginless">Replies</h1>
+                        <p class="is-size-6">{{thread.posts.count}}</p>
+                    </div>
+                    <div class="count">
+                        {% if thread.posts.last %}
+                            <img class="profile-photo-thumbnail" src="{{thread.posts.last.actor.profile.photo.url}}">
+                        {% else %}
+                            <img class="profile-photo-thumbnail" src="{{thread.actor.profile.photo.url}}">
+                        {% endif %}
+                    </div>
+                    <div class="count">
+                        <div>
+                            <h1 class="is-size-6 is-marginless">Last Post by</h1>
+                            {% if thread.posts.last %}
+                                <p class="is-size-6"><a href="{% url 'profile_page' pk=thread.posts.last.actor.pk %}">{{thread.posts.last.actor}}</a></p>
+                            {% else %}
+                                <p class="is-size-6"><a href="{% url 'profile_page' pk=thread.actor.pk %}">{{thread.actor}}</a></p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="u-padding">
+                    <p>This forum is empty.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

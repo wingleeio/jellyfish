@@ -1,0 +1,65 @@
+{% extends 'forum/base.html' %}
+{% load static %}
+{% get_media_prefix %}
+{% block content %}
+<section class="section">
+    <div class="container">
+        {% for category in categories %}
+        <h1 class="title mobile-padding">{{category.title}}</h1>
+        <div class="box">
+            {% for forum in category.forums.all %}
+                <div class="u-padding jelly-block">
+                    <div class="jelly-block-main">
+                        <h1 class="title is-size-5 is-marginless"><a href="{% url 'forum_page' pk=forum.pk %}">{{forum.title}}</a></h1>
+                        <p>{{forum.description}}</p>
+                    </div>
+                    <div class="right-jelly-block">
+                        <div class="count">
+                            <h1 class="is-size-6 is-marginless">Discussions</h1>
+                            <p>{{forum.threads.count}}</p>
+                        </div>
+                        <div class="count">
+                            <h1 class="is-size-6 is-marginless">Replies</h1>
+                            <p class="is-size-6">{{forum.posts.count}}</p>
+                        </div>
+                        <div class="count">
+                            {% if forum.threads.last.date > forum.posts.last.date %}
+                                <img class="profile-photo-thumbnail" src="{{forum.threads.last.actor.profile.photo.url}}">
+                            {% elif forum.posts.last.date > forum.threads.last.date %}
+                                <img class="profile-photo-thumbnail" src="{{forum.posts.last.actor.profile.photo.url}}">
+                            {% elif forum.threads.last %}
+                                <img class="profile-photo-thumbnail" src="{{forum.threads.last.actor.profile.photo.url}}">
+                            {% else %}
+                                <img class="profile-photo-thumbnail" src="media/profile-img/default.jpeg">
+                            {% endif %}
+                        </div>
+                        <div class="count">
+                            <div>
+                                <h1 class="is-size-6 is-marginless">Last Post by</h1>
+                                {% if forum.threads.last.date > forum.posts.last.date %}
+                                    <p class="is-size-6"><a href="{% url 'profile_page' pk=forum.threads.last.actor.pk %}">{{forum.threads.last.actor}}</a></p>
+                                {% elif forum.posts.last.date > forum.threads.last.date %}
+                                    <p class="is-size-6"><a href="{% url 'profile_page' pk=forum.posts.last.actor.pk %}">{{forum.posts.last.actor}}</a></p>
+                                {% elif forum.threads.last %}
+                                    <p class="is-size-6"><a href="{% url 'profile_page' pk=forum.threads.last.actor.pk %}">{{forum.threads.last.actor}}</a></p>
+                                {% else %}
+                                    <p class="is-size-6">nobody</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="u-padding">
+                    <p>This category has no forums.</p>
+                </div>
+            {% endfor %}
+        </div>
+        {% empty %}
+        <div class="u-padding">
+            <p>Nothing has been made yet.</p>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

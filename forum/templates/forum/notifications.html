@@ -1,0 +1,14 @@
+{% extends 'forum/base.html' %}
+{% load static %}
+{% get_media_prefix %}
+{% block content %}
+<section class="section">
+    <div class="container">
+        <div class="box">
+            {% for notif in notifs%}
+                
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

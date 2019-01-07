@@ -1,0 +1,28 @@
+{% extends 'forum/base.html' %}
+{% load static %}
+{% block content %}
+<section class="section">
+    <div class="container">
+        <nav class="breadcrumb mobile-padding" aria-label="breadcrumbs">
+            <ul>
+                <li><a href="{% url 'category_page' %}">Home</a></li>
+                <li><a href="{% url 'forum_page' pk=forum.pk %}">{{forum.title}}</a></li>
+                <li class="is-active"><a href="#" aria-current="page">New Discussion</a></li>
+            </ul>
+        </nav>
+        <div class="box">
+            <form method="POST" class="form-reset">
+                {% csrf_token %}
+                {{form}}
+                <button type="submit" class="button has-text-white has-background-primary is-medium">Post</button>
+            </form>
+        </div>
+    </div>
+</section>
+<script>
+    $("#id_title").addClass("input jelly-form-margin");
+    $("#id_content").addClass("textarea jelly-form-margin");
+
+    $("label").addClass("title is-size-6 jelly-form-margin");
+</script>
+{% endblock %}

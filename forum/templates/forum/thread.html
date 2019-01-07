@@ -1,0 +1,114 @@
+{% extends 'forum/base.html' %}
+{% load static %}
+{% load forum_extras %}
+{% block content %}
+<section class="section">
+    {{log}}
+    <div class="container">
+        <nav class="breadcrumb mobile-padding" aria-label="breadcrumbs">
+            <ul>
+                <li><a href="{% url 'category_page' %}">Home</a></li>
+                <li><a href="{% url 'forum_page' pk=thread.ancestor.pk %}">{{thread.ancestor.title}}</a></li>
+                <li class="is-active"><a href="#" aria-current="page">{{thread.title|truncatechars:25 }}</a></li>
+            </ul>
+        </nav>
+        {% if unread_count > 0 %}
+        <div id="unread-notif" class="box has-background-warning">
+            <div class="unread-box">
+                <div class="unread-message">You had {{unread_count}} unread notifications in this discussion.</div>
+                <div><a id="close-unread" class="has-text-white"><i class="fas fa-times-circle"></i></a></div>
+            </div>
+        </div>
+        {% endif %}
+        <div class="box">
+            <div class="post-box">
+                {% if user.is_authenticated %}
+                <div class="post-vote">
+                    <a class="{{thread|thread_up_is_active:user}}" href="{% url 'like_thread' pk=thread.pk %}"><i class="fas fa-arrow-up"></i></a>
+                {% endif %}
+                    <p class="vote-number is-5 {{thread|thread_num_is_active:user}}">{{thread|thread_count_likes}}</p>
+                {% if user.is_authenticated %}
+                    <a class="{{thread|thread_down_is_active:user}}" href="{% url 'dislike_thread' pk=thread.pk %}"><i class="fas fa-arrow-down"></i></a>
+                </div>
+                {% endif %}
+                <div class="inner-post-box">
+                    <div class="profile-summary p-padding min-width">
+                        <img class="profile-photo" src="{{thread.actor.profile.photo.url}}">
+                        <p class="title is-size-6"><a href="{% url 'profile_page' pk=thread.actor.pk %}">{{thread.actor}}</a></p>
+                        <p>Posts: {{thread.actor|count_posts}}</p>
+                    </div>
+                    <div class="post-content c-padding">
+                        <p class="min-height">{{thread.content}}</p>
+                        <br>
+                        {% if user == thread.actor %}
+                        <a class="has-text-primary" href="{% url 'thread_edit' pk=thread.pk %}"><i class="fas fa-edit"></i></a>
+                        <a class="has-text-primary" href="{% url 'thread_remove' pk=thread.pk %}"><i class="fas fa-trash-alt"></i></a>
+                        <br>
+                        {% endif %}  
+                        <p class="is-size-7">Posted {{thread.date|timesince}} ago.</p>
+                        <hr>
+                        <p class="is-size-7">{{thread.actor.profile.signature}}</p>
+                    </div>
+                </div>
+            </div>
+            {% for post in thread.posts.all %}
+            <hr>
+            <div class="post-box">
+                {% if user.is_authenticated %}
+                <div class="post-vote justify-center spacing">
+                    <a class="{{post|up_is_active:user}}" href="{% url 'like_post' tpk=thread.pk pk=post.pk %}"><i class="fas fa-arrow-up"></i></a>
+                {% endif %}
+                    <p class="vote-number is-5 {{post|num_is_active:user}}">{{post|count_likes}}</p>
+                {% if user.is_authenticated %}
+                    <a class="{{post|down_is_active:user}}" href="{% url 'dislike_post' tpk=thread.pk pk=post.pk %}"><i class="fas fa-arrow-down"></i></a>
+                </div>
+                {% endif %}
+                <div class="inner-post-box">
+                    <div class="p-padding profile-summary u-padding">
+                        <img class="profile-photo" src="{{post.actor.profile.photo.url}}">
+                        <p class="title is-size-6"><a href="{% url 'profile_page' pk=post.actor.pk %}">{{post.actor}}</a></p>
+                        <p>Posts: {{post.actor|count_posts}}</p>
+                    </div>
+                    <div class="post-content c-padding">
+                        <p class="min-height">{{post.content}}</p>
+                        <br>
+                        {% if user == post.actor %}
+                        <a class="has-text-primary" href="{% url 'post_edit' pk=post.pk %}"><i class="fas fa-edit"></i></a>
+                        <a class="has-text-primary" href="{% url 'post_remove' pk=post.pk %}"><i class="fas fa-trash-alt"></i></a>
+                        <br>
+                        {% endif %}  
+                        <p class="is-size-7">Posted {{post.date|timesince}} ago.</p>
+                        <hr>
+                        <p class="is-size-7">{{post.actor.profile.signature}}</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% if user.is_authenticated %}
+        <div class="box">
+            <form method="POST" class="form-reset">
+                {% csrf_token %}
+                {{form}}
+                <br>
+                <button type="submit" class="button has-text-white has-background-primary is-medium">Post Reply</button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+</section>
+<script>
+    $("#id_title").addClass("input jelly-form-margin");
+    $("#id_content").addClass("textarea jelly-form-margin");
+
+    $("#id_subscribe").addClass("checkbox");
+
+    $("label").addClass("title is-size-6 jelly-form-margin");
+
+    $(document).ready(function() {
+        $("#close-unread").click(function() {
+            $("#unread-notif").addClass("inactive");
+        });
+    });
+</script>
+{% endblock %}

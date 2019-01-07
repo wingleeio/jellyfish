@@ -1,0 +1,148 @@
+{% load static %}
+{% load forum_extras %}
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css">
+    <link rel="stylesheet" href="{% static 'css/jellyfish.css' %}">
+    <link rel="stylesheet" href="{% static 'css/bulma.css' %}">
+    <link rel="shortcut icon" type="image/png" href="{% static 'favicon.ico' %}"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <title>{{page_title}}</title>
+</head>
+<html>
+    <body>
+        <nav class="navbar" role="navigation" aria-label="main navigation">
+            <div class="navbar-brand u-padding">
+                <a class="navbar-item title is-marginless is-size-5" href="{% url 'category_page' %}">
+                    <img src="{% static 'android-chrome-512x512.png'%}"> &nbsp&nbspJellyfish
+                </a>
+                <a role="button" class="navbar-burger" data-target="navMenu" aria-label="menu" aria-expanded="false">
+                    <span aria-hidden="true"></span>
+                    <span aria-hidden="true"></span>
+                    <span aria-hidden="true"></span>
+                </a>
+            </div>
+            <div class="navbar-menu u-padding is-shadowless" id="navMenu">
+                <a class="navbar-item" href="{% url 'category_page' %}">Home</a>
+                <a class="navbar-item">Pricing</a>
+                <a class="navbar-item">Community</a>
+                <a class="navbar-item">Documentation</a>
+                <div class="navbar-end">
+                    <div class="buttons">
+                        {% if user.is_authenticated %}
+                            <p class="blurb">Welcome, <a href="{% url 'profile_page' pk=user.pk %}">{{user.username}}</a></p>
+                            <a id="notif" class="button">{{unread.count}} &nbsp<i class="fas fa-bell"></i></a>
+                            <div id="notiftray" class="inactive">
+                                {% for notif in notifs %}
+                                <div class="card notification-item u-padding
+                                {% if request.user in notif.read.all %}
+                                {% else %}
+                                    has-background-warning
+                                {% endif %}
+                                ">
+                                    <img class="profile-photo-small" src="{{notif.actor.profile.photo.url}}">
+                                    <div class="u-padding">
+                                    {% if notif.content_type.model == 'post' %}
+                                        <a href="{% url 'profile_page' pk=notif.actor.pk %}">{{notif.actor}}</a> posted a reply in <a href="{% url 'thread_page' pk=notif.content_object.ancestor.pk %}">{{notif.content_object.ancestor}}</a>
+                                    {% elif notif.content_type.model == 'likedislike' %}
+                                        <a href="{% url 'profile_page' pk=notif.actor.pk %}">{{notif.actor}}</a>
+                                    {% if notif.content_object.value == 1%} liked
+                                    {% else %} disliked
+                                    {% endif %} your post in 
+                                    {% if notif.content_object.post %}
+                                        <a href="{% url 'thread_page' pk=notif.content_object.post.ancestor.pk%}">{{notif.content_object.post.ancestor}}</a>
+                                    {% else %}
+                                        <a href="{% url 'thread_page' pk=notif.content_object.thread.pk%}">{{notif.content_object.thread}}</a>
+                                    {% endif %}
+                                    {% elif notif.content_type.model == 'profilepost' %}
+                                        <a href="{% url 'profile_page' pk=notif.actor.pk %}">{{notif.actor}}</a> posted on your <a href="{% url 'profile_page' pk=user.pk %}">profile</a>.
+                                    {% endif %}
+                                    </div>
+                                </div>
+                                {% empty %}
+                                <div class="card notification-item u-padding">
+                                    No notifications
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <a class="button" href="{% url 'profile_edit' %}">Edit Profile</a>
+                            <a class="button" href="{% url 'account_logout' %}">Logout</a>
+                        {% else %}
+                            <a class="button is-primary" href="{% url 'account_signup' %}"><strong>Sign up</strong></a>
+                            <a class="button is-light" href="{% url 'account_login' %}">Log in</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <header id="hero" class="hero is-primary is-medium">
+            <div class="hero-body">
+                <div class="container">
+                    {% if page_title %}
+                    <h1 class="title">
+                        {% if thread.pk %}
+                        {% if user.is_authenticated %}
+                        {% if subscribed %}
+                        <a class="has-text-link" href="{% url 'subscribe' pk=thread.pk %}"><i class="fas fa-bell"></i></a>
+                        {% elif not subscribed %}
+                        <a  class="has-text-link" href="{% url 'subscribe' pk=thread.pk %}"><i class="fas fa-bell-slash"></i></a>
+                        {% endif %}
+                        {% endif %}   
+                        {% endif %}
+                        {{page_title}}
+                    </h1>
+                    <h2 class="subtitle">
+                        {{page_description}}
+                    </h2>
+                    {% elif userprofile %}
+                    <div class="profile-title up-padding">
+                        <img class="profile-photo-large" src="{{profile.photo.url}}">
+                        <div class="u-padding">
+                            <h1 class="title">
+                                {{profile.user}}'s Profile
+                            </h1>
+                            <h2 class="subtitle is-marginless">
+                                Posts: {{profile.user|count_posts}}
+                            </h2>
+                            <h2 class="subtitle is-marginless">
+                                Reputation: {{profile.user|user_rep}}
+                            </h2>
+                        </div>
+                    </div>
+                    {% else %}
+                    <h1 class="title">
+                        Jellyfish Forum
+                    </h1>
+                    <h2 class="subtitle">
+                        A forum made with Python and Django
+                    </h2>
+                    {% endif %}
+                    {% if user.is_authenticated %}
+                    {% if canpostdiscussion %}
+                        <a class="is-medium button-primary-gradient" href="{% url 'thread_new' pk=forum.pk %}">New Discussion</a>
+                    {% elif canreply%}
+                        <a class="is-medium button-primary-gradient" href="{% url 'post_new' pk=thread.pk %}">Post a reply</a>
+                    {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </header>
+{% block content %}
+{% endblock %}
+        <footer class="container u-padding count">
+            <p class="u-padding">Powered by <a>Jellyfish</a></p>
+        </footer>
+    </body>
+    <script>
+    $(document).ready(function() {
+        $(".navbar-burger").click(function() {
+            $(".navbar-burger").toggleClass("is-active");
+            $(".navbar-menu").toggleClass("is-active");
+        });
+        $("#notif").click(function() {
+            $("#notiftray").toggleClass("inactive");
+        });
+    });
+    </script>
+</html>

@@ -1,0 +1,27 @@
+{% extends 'forum/base.html' %}
+
+{% load i18n %}
+
+{% block head_title %}{% trans "Sign Out" %}{% endblock %}
+
+{% block content %}
+<section class="section">
+<div class="container count">
+<div class="box">
+<div class="count">
+<p>{% trans 'Are you sure you want to sign out?' %}</p>
+
+<form method="post" action="{% url 'account_logout' %}">
+  {% csrf_token %}
+  {% if redirect_field_value %}
+  <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
+  {% endif %}
+  <br>
+  <button class="button has-background-danger has-text-white" type="submit">{% trans 'Sign Out' %}</button>
+</form>
+</div>
+</div>
+</div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends 'forum/base.html' %}
+{% load static %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <nav class="breadcrumb mobile-padding" aria-label="breadcrumbs">
+            <ul>
+                <li><a href="{% url 'category_page' %}">Home</a></li>
+                <li class="is-active"><a href="#" aria-current="page">Editing Profile</a></li>
+            </ul>
+        </nav>
+        <div class="box">
+            <img class="profile-photo jelly-form-margin" src="{{user.profile.photo.url}}">
+            <form id="profile-form" method="POST" class="form-reset" enctype="multipart/form-data">
+                {% csrf_token %}
+                {% load widget_tweaks %}
+                {{form}}
+                <br>
+                <button type="submit" class="button has-text-white has-background-primary is-medium">Save Profile</button>
+            </form>
+        </div>
+    </div>
+</section>
+<script>
+    $("#id_signature").addClass("textarea jelly-form-margin");
+    $("label").addClass("title is-size-6");
+    $("form").addClass("title is-size-6");
+    $("#photo-clear_id").css("display", "none");
+    $("label:nth-of-type(3)").css("display", "none");
+    $("label:nth-of-type(2)").css("display", "none");
+    $("label:nth-of-type(1)").css("display", "none");
+</script>
+{% endblock %}

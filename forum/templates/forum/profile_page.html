@@ -1,0 +1,98 @@
+{% extends 'forum/base.html' %}
+{% load forum_extras %}
+{% block content %}
+<section class="container u-padding">
+    <div class="profile-header mobile-column">
+        <div class="right-section">
+            {% if user.is_authenticated %}
+            <div class="box profile-post-form">
+                <form method="POST" class="form-reset">{% csrf_token %}
+                    {{form.as_p}}
+                    <button type="submit" class="button has-text-white has-background-primary is-medium">Post</button>
+                </form>
+            </div>
+            {% endif %}
+            <div class="box">
+                {% for activity in activities %}
+                <div class="post-box up-down-padding"> 
+                    {% if activity.profile %}
+                    <div class="profile-info u-padding">
+                        <img class="profile-photo2" src="{{activity.actor.profile.photo.url}}">
+                        <div class="u-padding">
+                            <p><a class="" href="{% url 'profile_page' pk=activity.actor.pk%}">{{activity.actor}}</a>
+                                    posted on 
+                                <a class="" href="{% url 'profile_page' pk=activity.profile.user.pk%}">
+                                    {{activity.profile.user}}'s
+                                </a> profile</p>
+                                <p class="c-padding">{{ activity.content }}</p>
+                                <p class="is-size-7">Posted <span class=" is-size-7">{{activity.date|timesince}} ago.</span></p>
+                        </div>
+                    </div>
+                    {% elif activity.title%}
+                    <div class="profile-info u-padding">
+                    <img class="profile-photo2" src="{{activity.actor.profile.photo.url}}"></img>
+                    <div class="u-padding">
+                        <p><a class="" href="{% url 'profile_page' pk=activity.actor.pk%}">{{activity.actor}}</a> posted <a class="" href="{% url 'thread_page' pk=activity.pk %}">{{activity.title}}</a> in <a class="" href="{% url 'forum_page' pk=activity.ancestor.pk %}">{{activity.ancestor}}</a></p>
+                        <p class=" is-size-7">{{activity.date|timesince}} ago</p>
+                    </div>  
+                    </div>
+                    {% elif activity.title%}
+                    <div class="profile-info u-padding">
+                    <img class="profile-photo2" src="{{activity.actor.profile.photo.url}}"></img>
+                    <div>
+                        <p>
+                            <a class="" href="{% url 'profile_page' pk=activity.actor.pk%}">
+                                {{activity.actor}}
+                            </a> 
+                            posted in 
+                            <a class="" href="{% url 'thread_page' pk=activity.thread.pk%}">
+                                {{activity.thread}}
+                            </a>
+                        </p>
+                        <p class=" is-size-7">{{activity.date|timesince}} ago</p>
+                    </div>
+                    </div>
+                    {% elif activity.actor %}
+                    <div class="profile-info u-padding">
+                        <img class="profile-photo2" src="{{activity.actor.profile.photo.url}}"></img>
+                        <div class="u-padding">
+                            <p><a href="{% url 'profile_page' pk=activity.actor.pk%}">{{activity.actor}}</a>
+                                {% if activity.value == 1 %} 
+                                liked a post in  
+                                {% elif activity.value == -1  %}
+                                disliked a post in  
+                                {% endif %}
+                                {% if activity.thread%}
+                                <a class="" href="{% url 'thread_page' pk=activity.thread.pk%}">
+                                    {{activity.thread.title}}
+                                </a>
+                                {% elif activity.post%}
+                                <a class="" href="{% url 'thread_page' pk=activity.post.ancestor.pk%}">
+                                    {{activity.post.ancestor.title}}
+                                </a>    
+                                {% endif %}
+                            </p>
+                            <p class=" is-size-7">{{activity.date|timesince}} ago</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                {% if forloop.last %}
+                {% else %}
+                <hr>
+                {% endif %}
+                {% empty %}
+                <div class="box">
+                    <p class="u-padding"><i class="far fa-frown"></i> &nbsp&nbsp{{profile.user}}'s profile is empty.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+<script>
+        $("#id_content").addClass("textarea u-padding jelly-form-margin");
+    
+        $("label").css("display","none");
+    </script>
+{% endblock %}
