@@ -170,7 +170,7 @@ def profile_edit(request):
                                    instance=request.user.profile)
         if form.is_valid():
             form.save()
-            return redirect('/forum')
+            return redirect('/')
 
     else:
         form = ProfileForm(instance=request.user.profile)
